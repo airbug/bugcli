@@ -74,17 +74,17 @@ require('bugpack').context("*", function(bugpack) {
 
             /**
              * @private
-             * @type {function(Map.<string, *>, function(Error))}
+             * @type {function(Map.<string, *>, function(Throwable=))}
              */
             this.executeMethod = null;
 
             /**
              * @private
-             * @type {function(Map.<string, *>, function(Error))}
+             * @type {function(Map.<string, *>, function(Throwable=))}
              */
             this.validateMethod = null;
 
-            //TODO BRN: We should replace this with the BugMarshaller
+            //TODO BRN: We should replace this with the BugMarsh system
 
             if (TypeUtil.isObject(cliActionObject)) {
                 if (TypeUtil.isBoolean(cliActionObject.default)) {
@@ -112,14 +112,14 @@ require('bugpack').context("*", function(bugpack) {
         },
 
         /**
-         * @return {function(Map.<string, *>, function(Error))}
+         * @return {function(Map.<string, *>, function(Throwable=))}
          */
         getExecuteMethod: function() {
             return this.executeMethod;
         },
 
         /**
-         * @return {function(Map.<string, *>, function(Error))}
+         * @return {function(Map.<string, *>, function(Throwable=))}
          */
         getValidateMethod: function() {
             return this.validateMethod;
