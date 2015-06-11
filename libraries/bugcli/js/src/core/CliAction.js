@@ -15,9 +15,12 @@
 //@Export('bugcli.CliAction')
 
 //@Require('Class')
+//@Require('Collections')
 //@Require('Obj')
+//@Require('Throwables')
 //@Require('TypeUtil')
-//@Require('bugcli.CliFlag')
+//@Require('bugcli.CliOption')
+//@Require('bugcli.CliParameter')
 
 
 //-------------------------------------------------------------------------------
@@ -30,10 +33,13 @@ require('bugpack').context("*", function(bugpack) {
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class       = bugpack.require('Class');
-    var Obj         = bugpack.require('Obj');
-    var TypeUtil    = bugpack.require('TypeUtil');
-    var CliFlag     = bugpack.require('bugcli.CliFlag');
+    var Class           = bugpack.require('Class');
+    var Collections     = bugpack.require('Collections');
+    var Obj             = bugpack.require('Obj');
+    var Throwables      = bugpack.require('Throwables');
+    var TypeUtil        = bugpack.require('TypeUtil');
+    var CliOption       = bugpack.require('bugcli.CliOption');
+    var CliParameter    = bugpack.require('bugcli.CliParameter');
 
 
     //-------------------------------------------------------------------------------
@@ -55,11 +61,10 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {Object} cliActionObject
          */
-        _constructor: function(cliActionObject) {
+        _constructor: function() {
 
-            this._super(cliActionObject);
+            this._super();
 
 
             //-------------------------------------------------------------------------------
@@ -68,33 +73,105 @@ require('bugpack').context("*", function(bugpack) {
 
             /**
              * @private
+             * @type {string}
+             */
+            this.command                = "";
+
+            /**
+             * @private
              * @type {boolean}
              */
-            this.default = false;
+            this.default                = false;
 
             /**
              * @private
              * @type {function(Map.<string, *>, function(Throwable=))}
              */
-            this.executeMethod = null;
+            this.executeMethod          = null;
+
+            /**
+             * @private
+             * @type {Map.<string, CliOption>}
+             */
+            this.flagToOptionMap        = new Collections.map();
+
+            /**
+             * @private
+             * @type {Set.<CliOption>}
+             */
+            this.optionSet              = Collections.set();
+
+            /**
+             * @private
+             * @type {List.<CliParameter>}
+             */
+            this.parameterList          = Collections.list();
+
+            /**
+             * @private
+             * @type {Map.<string, CliParameter>}
+             */
+            this.parameterMap           = Collections.map();
 
             /**
              * @private
              * @type {function(Map.<string, *>, function(Throwable=))}
              */
-            this.validateMethod = null;
+            this.validateMethod         = null;
+        },
 
-            //TODO BRN: We should replace this with the BugMarsh system
 
+        //-------------------------------------------------------------------------------
+        // Init Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {Object} cliActionObject
+         */
+        initWithObject: function(cliActionObject) {
+            this._super();
+
+            var _this = this;
             if (TypeUtil.isObject(cliActionObject)) {
+                if (TypeUtil.isString(cliActionObject.command)) {
+                    this.command = cliActionObject.command;
+                } else {
+                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.command must be specified and must be a string");
+                }
                 if (TypeUtil.isBoolean(cliActionObject.default)) {
                     this.default = cliActionObject.default;
                 }
                 if (TypeUtil.isFunction(cliActionObject.executeMethod)) {
                     this.executeMethod = cliActionObject.executeMethod;
+                } else {
+                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.executeMethod must be specified and must be a function");
                 }
                 if (TypeUtil.isFunction(cliActionObject.validateMethod)) {
                     this.validateMethod = cliActionObject.validateMethod;
+                }
+                if (TypeUtil.isArray(cliActionObject.options)) {
+                    cliActionObject.options.forEach(function(optionObject) {
+                        var cliOption = CliOption.alloc().initWithObject(optionObject);
+                        if (!_this.optionSet.contains(cliOption)) {
+                            _this.optionSet.add(cliOption);
+                            cliOption.getFlagSet().forEach(function(flag) {
+                                if (!_this.flagToOptionMap.containsKey(flag)) {
+                                    _this.flagToOptionMap.put(flag, cliOption);
+                                } else {
+                                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.options - duplicate flag found");
+                                }
+                            });
+                        } else {
+                            throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.options - duplicate option found");
+                        }
+                    });
+                }
+                if (TypeUtil.isArray(cliActionObject.parameters)) {
+                    cliActionObject.parameters.forEach(function (parameterObject) {
+                        var cliParameter = new CliParameter(parameterObject);
+                        _this.parameterList.add(cliParameter);
+                        _this.parameterMap.put(cliParameter.getName(), cliParameter);
+                    });
                 }
             }
         },
@@ -103,6 +180,13 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
         // Getters and Setters
         //-------------------------------------------------------------------------------
+
+        /**
+         * @return {string}
+         */
+        getCommand: function() {
+            return this.command;
+        },
 
         /**
          * @return {boolean}
@@ -119,10 +203,94 @@ require('bugpack').context("*", function(bugpack) {
         },
 
         /**
+         * @return {Set.<CliOption>}
+         */
+        getOptionSet: function() {
+            return this.optionSet;
+        },
+
+        /**
+         * @return {List.<CliParameter>}
+         */
+        getParameterList: function() {
+            return this.parameterList;
+        },
+
+        /**
          * @return {function(Map.<string, *>, function(Throwable=))}
          */
         getValidateMethod: function() {
             return this.validateMethod;
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Obj Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {*} value
+         * @return {boolean}
+         */
+        equals: function(value) {
+            if (Class.doesExtend(value, CliAction)) {
+                return Obj.equals(this.command, value.getCommand());
+            }
+            return false;
+        },
+
+        /**
+         * @return {number}
+         */
+        hashCode: function() {
+            if (!this._hashCode) {
+                this._hashCode = Obj.hashCode("[CliAction]" +
+                    Obj.hashCode(this.command));
+            }
+            return this._hashCode;
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Public Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {string} parameterName
+         * @return {CliParameter}
+         */
+        getParameterWithParameterName: function(parameterName) {
+            return this.parameterMap.get(parameterName);
+        },
+
+        /**
+         * @param {string} flag
+         * @return {CliOption}
+         */
+        getOptionWithFlag: function(flag) {
+            return this.flagToOptionMap.get(flag);
+        },
+
+        /**
+         * @param {string} flag
+         * @return {boolean}
+         */
+        hasOptionForFlag: function(flag) {
+            return this.flagToOptionMap.containsKey(flag);
+        },
+
+        /**
+         * @return {boolean}
+         */
+        hasOptions: function() {
+            return !this.optionSet.isEmpty();
+        },
+
+        /**
+         * @return {boolean}
+         */
+        hasParameters: function() {
+            return !this.parameterList.isEmpty();
         }
     });
 

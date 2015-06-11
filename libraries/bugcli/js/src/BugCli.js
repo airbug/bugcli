@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2014 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugmeta may be freely distributed under the MIT license.
  */
 
 
@@ -15,9 +12,9 @@
 //@Export('bugcli.BugCli')
 
 //@Require('Class')
-//@Require('Flows')
-//@Require('Map')
 //@Require('Obj')
+//@Require('Proxy')
+//@Require('bugcli.Cli')
 //@Require('bugcli.CliAction')
 //@Require('bugcli.CliBuild')
 //@Require('bugcli.CliOption')
@@ -32,33 +29,18 @@
 require('bugpack').context("*", function(bugpack) {
 
     //-------------------------------------------------------------------------------
-    // Common Modules
-    //-------------------------------------------------------------------------------
-
-    var path        = require('path');
-
-
-    //-------------------------------------------------------------------------------
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class       = bugpack.require('Class');
-    var Flows       = bugpack.require('Flows');
-    var Map         = bugpack.require('Map');
-    var Obj         = bugpack.require('Obj');
-    var CliAction   = bugpack.require('bugcli.CliAction');
-    var CliBuild    = bugpack.require('bugcli.CliBuild');
-    var CliOption   = bugpack.require('bugcli.CliOption');
-    var CliParser   = bugpack.require('bugcli.CliParser');
-    var CliRunner   = bugpack.require('bugcli.CliRunner');
-
-
-    //-------------------------------------------------------------------------------
-    // Simplify References
-    //-------------------------------------------------------------------------------
-
-    var $series     = Flows.$series;
-    var $task       = Flows.$task;
+    var Class               = bugpack.require('Class');
+    var Obj                 = bugpack.require('Obj');
+    var Proxy               = bugpack.require('Proxy');
+    var CliAction           = bugpack.require('bugcli.CliAction');
+    var CliBuild            = bugpack.require('bugcli.CliBuild');
+    var CliOption           = bugpack.require('bugcli.CliOption');
+    var CliParser           = bugpack.require('bugcli.CliParser');
+    var CliProgram          = bugpack.require('bugcli.CliProgram');
+    var CliRunner           = bugpack.require('bugcli.CliRunner');
 
 
     //-------------------------------------------------------------------------------
@@ -87,45 +69,49 @@ require('bugpack').context("*", function(bugpack) {
 
 
             //-------------------------------------------------------------------------------
+            // Public Properties
+            //-------------------------------------------------------------------------------
+
+            /**
+             * @type {function(new:CliAction)}
+             */
+            this.CliAction      = CliAction;
+
+            /**
+             * @type {function(new:CliBuild)}
+             */
+            this.CliBuild       = CliBuild;
+
+            /**
+             * @type {function(new:CliOption)}
+             */
+            this.CliOption      = CliOption;
+
+            /**
+             * @type {function(new:CliParser)}
+             */
+            this.CliParser      = CliParser;
+
+            /**
+             * @type {function(new:CliProgram)}
+             */
+            this.CliProgram     = CliProgram;
+
+            /**
+             * @type {function(new:CliRunner)}
+             */
+            this.CliRunner      = CliRunner;
+
+
+            //-------------------------------------------------------------------------------
             // Private Properties
             //-------------------------------------------------------------------------------
 
             /**
              * @private
-             * @type {CliParser}
+             * @type {CliProgram}
              */
-            this.cliParser = null;
-
-            /**
-             * @private
-             * @type {CliAction}
-             */
-            this.defaultCliAction = null;
-
-            /**
-             * @private
-             * @type {Map.<string, CliFlag>}
-             */
-            this.flagToCliFlagMap = new Map();
-        },
-
-
-        //-------------------------------------------------------------------------------
-        // Getters and Setters
-        //-------------------------------------------------------------------------------
-
-        /**
-         * @return {CliAction}
-         */
-        getDefaultCliAction: function() {
-            return this.defaultCliAction;
-        },
-
-        /**
-         * @return {boolean}
-         */
-        hasDefaultCliAction: function() {
-            return !!(this.defaultCliAction);
+            this.cliProgram     = null;
         },
 
 
@@ -134,92 +120,84 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {function(Error)} callback
+         * @param {{
+         *      command: string,
+         *      default: boolean=,
+         *      options: Array.<{
+         *          name: string,
+         *          flags: Array.<string>,
+         *          parameters: Array.<{
+         *              name: string
+         *          }>
+         *      }>,
+         *      parameters: Array.<{
+         *          name: string
+         *      }>,
+         *      executeMethod: function(CliBuild, CliAction, function(Throwable=)),
+         *      validateMethod: function(CliBuild, CliAction, function(Throwable=))
+         * }} cliActionObject
          */
-        configure: function(callback) {
-            this.cliParser = new CliParser(this);
-            callback();
+        action: function(cliActionObject) {
+            this.program().action(cliActionObject);
         },
 
         /**
-         * @param {string} flagName
-         * @return {boolean}
+         * @return {CliProgram}
          */
-        containsCliFlag: function(flagName) {
-            return this.flagToCliFlagMap.containsKey(flagName);
+        program: function() {
+            if (!this.cliProgram) {
+                this.cliProgram = new CliProgram();
+            }
+            return this.cliProgram;
         },
 
         /**
-         * @param {string} flagName
-         * @return {CliFlag}
-         */
-        getCliFlag: function(flagName) {
-            return this.flagToCliFlagMap.get(flagName);
-        },
-
-        /**
-         *
+         * @param {Array.<string>} argv
+         * @param {function(Throwable=)} callback
          */
         run: function(argv, callback) {
-            var _this = this;
-            var cliBuild = new CliBuild();
-            var cliRunner = new CliRunner(this, cliBuild);
-            $series([
-                $task(function(flow) {
-                    _this.cliParser.parse(argv, cliBuild, function(error) {
-                        flow.complete(error);
-                    });
-                }),
-                $task(function(flow) {
-                    cliRunner.run(function(error) {
-                        flow.complete(error);
-                    });
-                })
-            ]).execute(callback);
-        },
-
-
-        //-------------------------------------------------------------------------------
-        // Protected Class Methods
-        //-------------------------------------------------------------------------------
-
-        /**
-         * @protected
-         * @param {Object} cliActionObject
-         */
-        registerCliAction: function(cliActionObject) {
-            var _this = this;
-
-            //TODO BRN: We should replace this with the BugMarshaller
-
-            var cliAction = new CliAction(cliActionObject);
-            cliAction.getFlagSet().forEach(function(flag) {
-                _this.flagToCliFlagMap.put(flag, cliAction);
-            });
-            if (cliAction.getDefault()) {
-                if (!this.hasDefaultCliAction()) {
-                    this.defaultCliAction = cliAction;
-                } else {
-                    throw new Error("Can only specify one cliAction default. Found a second '" + cliAction.getName() + "'")
-                }
-            }
-        },
-
-        /**
-         * @protected
-         * @param {Object} cliOptionObject
-         */
-        registerCliOption: function(cliOptionObject) {
-            var _this = this;
-
-            //TODO BRN: We should replace this with the BugMarshaller
-
-            var cliOption = new CliOption(cliOptionObject);
-            cliOption.getFlagSet().forEach(function(flag) {
-                _this.flagToCliFlagMap.put(flag, cliOption);
-            });
+            this.program().run(argv, callback);
         }
     });
+
+
+    //-------------------------------------------------------------------------------
+    // Private Static Properties
+    //-------------------------------------------------------------------------------
+
+    /**
+     * @static
+     * @private
+     * @type {BugCli}
+     */
+    BugCli.instance = null;
+
+
+    //-------------------------------------------------------------------------------
+    // Public Static Methods
+    //-------------------------------------------------------------------------------
+
+    /**
+     * @static
+     * @return {BugMeta}
+     */
+    BugCli.getInstance = function() {
+        if (BugCli.instance === null) {
+            BugCli.instance = new BugCli();
+        }
+        return BugCli.instance;
+    };
+
+
+    //-------------------------------------------------------------------------------
+    // Static Proxy
+    //-------------------------------------------------------------------------------
+
+    Proxy.proxy(BugCli, Proxy.method(BugCli.getInstance), [
+        "action",
+        "program",
+        "run"
+    ]);
 
 
     //-------------------------------------------------------------------------------

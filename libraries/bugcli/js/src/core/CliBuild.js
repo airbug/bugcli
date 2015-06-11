@@ -15,7 +15,6 @@
 //@Export('bugcli.CliBuild')
 
 //@Require('Class')
-//@Requite('Map')
 //@Require('Obj')
 
 
@@ -30,7 +29,6 @@ require('bugpack').context("*", function(bugpack) {
     //-------------------------------------------------------------------------------
 
     var Class   = bugpack.require('Class');
-    var Map     = bugpack.require('Map');
     var Obj     = bugpack.require('Obj');
 
 
@@ -67,13 +65,7 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {CliActionInstance}
              */
-            this.cliActionInstance = null;
-
-            /**
-             * @private
-             * @type {Map.<string, CliOptionInstance>}
-             */
-            this.cliOptionInstanceMap = new Map();
+            this.cliActionInstance      = null;
         },
 
 
@@ -82,7 +74,6 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         *
          * @return {CliActionInstance}
          */
         getCliActionInstance: function() {
@@ -102,47 +93,10 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {CliOptionInstance} cliOptionInstance
-         */
-        addCliOptionInstance: function(cliOptionInstance) {
-            this.cliOptionInstanceMap.put(cliOptionInstance.getCliOption().getName(), cliOptionInstance);
-        },
-
-        /**
-         * @return {CliActionInstance}
-         */
-        getAction: function() {
-            return this.cliActionInstance;
-        },
-
-        /**
-         * @param {string} optionName
-         * @return {CliOptionInstance}
-         */
-        getOption: function(optionName) {
-            return this.getCliOptionInstance(optionName);
-        },
-
-        /**
-         * @return {CliOptionInstance}
-         */
-        getCliOptionInstance: function(optionName) {
-            return this.cliOptionInstanceMap.get(optionName);
-        },
-
-        /**
          * @return {boolean}
          */
         hasCliActionInstance: function() {
             return this.cliActionInstance !== null;
-        },
-
-        /**
-         * @param {CliOptionInstance} cliOptionInstance
-         * @return {boolean}
-         */
-        hasCliOptionInstance: function(cliOptionInstance) {
-            return this.cliOptionInstanceMap.containsValue(cliOptionInstance);
         }
     });
 

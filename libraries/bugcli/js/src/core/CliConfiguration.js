@@ -12,15 +12,13 @@
 // Annotations
 //-------------------------------------------------------------------------------
 
-//@Export('bugcli.CliFlag')
+//@Export('bugcli.CliConfiguration')
 
 //@Require('Class')
-//@Require('List')
-//@Require('Map')
+//@Require('Collections')
 //@Require('Obj')
-//@Require('Set')
+//@Require('Throwables')
 //@Require('TypeUtil')
-//@Require('bugcli.CliParameter')
 
 
 //-------------------------------------------------------------------------------
@@ -34,12 +32,10 @@ require('bugpack').context("*", function(bugpack) {
     //-------------------------------------------------------------------------------
 
     var Class           = bugpack.require('Class');
-    var List            = bugpack.require('List');
-    var Map             = bugpack.require('Map');
+    var Collections     = bugpack.require('Collections');
     var Obj             = bugpack.require('Obj');
-    var Set             = bugpack.require('Set');
+    var Throwables      = bugpack.require('Throwables');
     var TypeUtil        = bugpack.require('TypeUtil');
-    var CliParameter    = bugpack.require('bugcli.CliParameter');
 
 
     //-------------------------------------------------------------------------------
@@ -50,9 +46,9 @@ require('bugpack').context("*", function(bugpack) {
      * @class
      * @extends {Obj}
      */
-    var CliFlag = Class.extend(Obj, {
+    var CliConfiguration = Class.extend(Obj, {
 
-        _name: "bugcli.CliFlag",
+        _name: "bugcli.CliConfiguration",
 
 
         //-------------------------------------------------------------------------------
@@ -61,9 +57,8 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {} cliFlagObject
          */
-        _constructor: function(cliFlagObject) {
+        _constructor: function() {
 
             this._super();
 
@@ -74,53 +69,21 @@ require('bugpack').context("*", function(bugpack) {
 
             /**
              * @private
-             * @type {Set.<string>}
+             * @type {Set.<CliAction>}
              */
-            this.flagSet = new Set();
+            this.cliActionSet               = Collections.set();
 
             /**
              * @private
-             * @type {string}
+             * @type {Map.<string, CliAction>}
              */
-            this.name = "";
+            this.commandToCliActionMap      = new Collections.map();
 
             /**
              * @private
-             * @type {List.<CliParameter>}
+             * @type {CliAction}
              */
-            this.cliParameterList = new List();
-
-            /**
-             * @private
-             * @type {Map.<string, CliParameter>}
-             */
-            this.cliParameterMap = new Map();
-
-            //TODO BRN: We should replace this with the BugMarshaller
-
-            var _this = this;
-            if (TypeUtil.isObject(cliFlagObject)) {
-                if (TypeUtil.isString(cliFlagObject.name)) {
-                    this.name = cliFlagObject.name;
-                }
-                if (TypeUtil.isArray(cliFlagObject.flags)) {
-                    cliFlagObject.flags.forEach(function(flag) {
-                        if (TypeUtil.isString(flag)) {
-                            _this.flagSet.add(flag);
-                        }
-                    });
-                }
-                if (TypeUtil.isArray(cliFlagObject.parameters)) {
-                    cliFlagObject.parameters.forEach(function(parameterObject) {
-
-                        //TODO BRN: We should replace this with the BugMarshaller
-
-                        var cliParameter = new CliParameter(parameterObject);
-                        _this.cliParameterList.add(cliParameter);
-                        _this.cliParameterMap.put(cliParameter.getName(), cliParameter);
-                    });
-                }
-            }
+            this.defaultCliAction           = null;
         },
 
 
@@ -129,24 +92,17 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @return {Set.<string>}
+         * @return {Set.<CliAction>}
          */
-        getFlagSet: function() {
-            return this.flagSet;
+        getCliActionSet: function() {
+            return this.cliActionSet;
         },
 
         /**
-         * @return {string}
+         * @return {CliAction}
          */
-        getName: function() {
-            return this.name;
-        },
-
-        /**
-         * @return {List.<CliParameter>}
-         */
-        getCliParameterList: function() {
-            return this.cliParameterList;
+        getDefaultCliAction: function() {
+            return this.defaultCliAction;
         },
 
 
@@ -155,18 +111,43 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {string} parameterName
-         * @return {CliParameter}
+         * @param {CliAction} cliAction
          */
-        getCliParameterByName: function(parameterName) {
-            return this.cliParameterMap.get(parameterName);
+        addCliAction: function(cliAction) {
+            if (this.cliActionSet.contains(cliAction)) {
+                throw Throwables.exception("CliConfigurationException", {}, "CliAction already exists for the command '" + cliAction.getCommand() + "'");
+            }
+            this.commandToCliActionMap.put(cliAction.getCommand(), cliAction);
+            if (cliAction.getDefault()) {
+                if (!this.hasDefaultCliAction()) {
+                    this.defaultCliAction = cliAction;
+                } else {
+                    throw Throwables.exception("CliConfigurationException", {}, "Can only specify one cliAction default. Found a second '" + cliAction.getCommand() + "'");
+                }
+            }
+        },
+
+        /**
+         * @param {string} command
+         * @return {CliAction}
+         */
+        getCliActionWithCommand: function(command) {
+            return this.commandToCliActionMap.get(command);
+        },
+
+        /**
+         * @param {string} command
+         * @returns {boolean}
+         */
+        hasCliActionWithCommand: function(command) {
+            return this.commandToCliActionMap.containsKey(command);
         },
 
         /**
          * @return {boolean}
          */
-        hasParameters: function() {
-            return !this.cliParameterMap.isEmpty();
+        hasDefaultCliAction: function() {
+            return !!this.defaultCliAction;
         }
     });
 
@@ -175,5 +156,5 @@ require('bugpack').context("*", function(bugpack) {
     // Exports
     //-------------------------------------------------------------------------------
 
-    bugpack.export('bugcli.CliFlag', CliFlag);
+    bugpack.export('bugcli.CliConfiguration', CliConfiguration);
 });

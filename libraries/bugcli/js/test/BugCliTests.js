@@ -57,7 +57,7 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         setup: function() {
-            this.bugCli = new BugCli();
+            this.bugCli = BugCli.alloc().init();
             this.argv = [
                 "dummy",
                 "dummy",
@@ -117,18 +117,12 @@ require('bugpack').context("*", function(bugpack) {
                 ]
             });
 
-            this.bugCli.configure(function(error) {
+           this.bugCli.run(this.argv, function(error) {
                 if (!error) {
-                    _this.bugCli.run(_this.argv, function(error) {
-                        if (!error) {
-                            test.assertTrue(validateCalled,
-                                "Assert that validate was called");
-                            test.assertTrue(executeCalled,
-                                "Assert that execute was called");
-                        } else {
-                            test.error(error);
-                        }
-                    })
+                    test.assertTrue(validateCalled,
+                        "Assert that validate was called");
+                    test.assertTrue(executeCalled,
+                        "Assert that execute was called");
                 } else {
                     test.error(error);
                 }
@@ -145,7 +139,7 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         setup: function() {
-            this.bugCli = new BugCli();
+            this.bugCli = BugCli.alloc().init();
             this.argv = [
                 "dummy",
                 "dummy",
@@ -205,18 +199,12 @@ require('bugpack').context("*", function(bugpack) {
                 ]
             });
 
-            this.bugCli.configure(function(error) {
+            this.bugCli.run(this.argv, function(error) {
                 if (!error) {
-                    _this.bugCli.run(_this.argv, function(error) {
-                        if (!error) {
-                            test.assertTrue(validateCalled,
-                                "Assert that validate was called");
-                            test.assertTrue(executeCalled,
-                                "Assert that execute was called");
-                        } else {
-                            test.error(error);
-                        }
-                    })
+                    test.assertTrue(validateCalled,
+                        "Assert that validate was called");
+                    test.assertTrue(executeCalled,
+                        "Assert that execute was called");
                 } else {
                     test.error(error);
                 }

@@ -53,11 +53,8 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {{
-         *      name: string
-         * }} cliParameterObject
          */
-        _constructor: function(cliParameterObject) {
+        _constructor: function() {
 
             this._super();
 
@@ -71,9 +68,20 @@ require('bugpack').context("*", function(bugpack) {
              * @type {string}
              */
             this.name = "";
+        },
 
-            //TODO BRN: We should replace this with the BugMarshaller
 
+        //-------------------------------------------------------------------------------
+        // Init Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {{
+         *      name: string
+         * }} cliParameterObject
+         */
+        initWithObject: function(cliParameterObject) {
+            this.init();
             if (TypeUtil.isObject(cliParameterObject)) {
                 if (TypeUtil.isString(cliParameterObject.name)) {
                     this.name = cliParameterObject.name;

@@ -58,11 +58,32 @@ require('bugpack').context("*", function(bugpack) {
 
         setup: function() {
             this.testCliActionObject    = {
+                command: "test-command",
                 default: true,
+                parameters: [
+                    {
+                        name: "testFlag"
+                    }
+                ],
+                options: [
+                    {
+                        name: "test-option",
+                        flags: [
+                            '-to',
+                            '--test-option'
+                        ],
+                        required: true,
+                        parameters: [
+                            {
+                                name: "testOption"
+                            }
+                        ]
+                    }
+                ],
                 executeMethod: function() {},
                 validateMethod: function() {}
             };
-            this.testCliAction          = new CliAction(this.testCliActionObject);
+            this.testCliAction          = CliAction.alloc().initWithObject(this.testCliActionObject);
         },
 
 
@@ -72,12 +93,26 @@ require('bugpack').context("*", function(bugpack) {
         test: function(test) {
             test.assertTrue(Class.doesExtend(this.testCliAction, CliAction),
                 "Assert instance of CliAction");
+            test.assertEqual(this.testCliAction.getCommand(), this.testCliActionObject.command,
+                "Assert CliAction.command was set correctly");
             test.assertEqual(this.testCliAction.getDefault(), this.testCliActionObject.default,
                 "Assert CliAction.default was set correctly");
             test.assertEqual(this.testCliAction.getExecuteMethod(), this.testCliActionObject.executeMethod,
                 "Assert CliAction.executeMethod was set correctly");
             test.assertEqual(this.testCliAction.getValidateMethod(), this.testCliActionObject.validateMethod,
                 "Assert CliAction.validateMethod was set correctly");
+            test.assertEqual(this.testCliAction.getOptionSet().getCount(), 1,
+                "Assert CliAction.optionSet count is 1");
+            if (this.testCliAction.getOptionSet().getCount() === 1) {
+                test.assertEqual(this.testCliAction.getOptionSet().toArray()[0].getName(), this.testCliActionObject.options[0].name,
+                    "Assert CliAction.optionSet was set correctly");
+            }
+            test.assertEqual(this.testCliAction.getParameterList().getCount(), 1,
+                "Assert CliAction.parameterList count is 1");
+            if (this.testCliAction.getParameterList().getCount() === 1) {
+                test.assertEqual(this.testCliAction.getParameterList().getAt(0).getName(), this.testCliActionObject.parameters[0].name,
+                    "Assert CliAction.parameterList was set correctly");
+            }
         }
     };
 

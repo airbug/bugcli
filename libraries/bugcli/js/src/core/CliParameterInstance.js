@@ -51,10 +51,8 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {CliParameter} cliParameter
-         * @param {*} value
          */
-        _constructor: function(cliParameter, value) {
+        _constructor: function() {
 
             this._super();
 
@@ -67,12 +65,27 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {CliParameter}
              */
-            this.cliParameter = cliParameter;
+            this.cliParameter   = null;
 
             /**
              * @private
              * @type {*}
              */
+            this.value          = null;
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Init Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {CliParameter} cliParameter
+         * @param {*} value
+         */
+        initWithCliParameterAndValue: function(cliParameter, value) {
+            this.init();
+            this.cliParameter = cliParameter;
             this.value = value;
         },
 

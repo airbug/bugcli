@@ -15,8 +15,9 @@
 //@Export('bugcli.CliOptionInstance')
 
 //@Require('Class')
+//@Require('Collections')
 //@Require('Obj')
-//@Require('bugcli.CliFlagInstance')
+//@Require('bugcli.CliParameterInstance')
 
 
 //-------------------------------------------------------------------------------
@@ -29,9 +30,10 @@ require('bugpack').context("*", function(bugpack) {
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class               = bugpack.require('Class');
-    var Obj                 = bugpack.require('Obj');
-    var CliFlagInstance     = bugpack.require('bugcli.CliFlagInstance');
+    var Class                   = bugpack.require('Class');
+    var Collections             = bugpack.require('Collections');
+    var Obj                     = bugpack.require('Obj');
+    var CliParameterInstance    = bugpack.require('bugcli.CliParameterInstance');
 
 
     //-------------------------------------------------------------------------------
@@ -40,9 +42,9 @@ require('bugpack').context("*", function(bugpack) {
 
     /**
      * @class
-     * @extends {CliFlagInstance}
+     * @extends {Obj}
      */
-    var CliOptionInstance = Class.extend(CliFlagInstance, {
+    var CliOptionInstance = Class.extend(Obj, {
 
         _name: "bugcli.CliOptionInstance",
 
@@ -53,11 +55,10 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {CliOption} cliOption
          */
-        _constructor: function(cliOption) {
+        _constructor: function() {
 
-            this._super(cliOption);
+            this._super();
 
 
             //-------------------------------------------------------------------------------
@@ -68,6 +69,25 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {CliOption}
              */
+            this.cliOption                  = null;
+
+            /**
+             * @private
+             * @type {Map.<string, CliParameterInstance>}
+             */
+            this.cliParameterInstanceMap    = Collections.map();
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Init Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {CliOption} cliOption
+         */
+        initWithCliOption: function(cliOption) {
+            this.init(cliOption);
             this.cliOption = cliOption;
         },
 
@@ -108,6 +128,61 @@ require('bugpack').context("*", function(bugpack) {
                     Obj.hashCode(this.cliOption));
             }
             return this._hashCode;
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Public Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {string} parameterName
+         * @param {string} value
+         */
+        addCliParameterInstance: function(parameterName, value) {
+            var cliParameter = this.cliOption.getParameterWithParameterName(parameterName);
+            var cliParameterInstance = new CliParameterInstance(cliParameter, value);
+            this.cliParameterInstanceMap.put(parameterName, cliParameterInstance);
+        },
+
+        /**
+         * @param {string} parameterName
+         * @return {CliParameterInstance}
+         */
+        getCliParameterInstance: function(parameterName) {
+            return this.cliParameterInstanceMap.get(parameterName);
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Convenience Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @return {string}
+         */
+        getName: function() {
+            return this.cliOption.getName();
+        },
+
+        /**
+         * @param {string} parameterName
+         * @return {*}
+         */
+        getParameter: function(parameterName) {
+            var cliParameterInstance = this.getCliParameterInstance(parameterName);
+            if (cliParameterInstance) {
+                return cliParameterInstance.getValue();
+            }
+            return null;
+        },
+
+        /**
+         * @param {string} parameterName
+         * @return {boolean}
+         */
+        hasParameter: function(parameterName) {
+            return this.cliParameterInstanceMap.containsKey(parameterName);
         }
     });
 

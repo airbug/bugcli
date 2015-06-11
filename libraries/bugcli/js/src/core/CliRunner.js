@@ -17,6 +17,7 @@
 //@Require('Class')
 //@Require('Flows')
 //@Require('Obj')
+//@Require('Throwables')
 
 
 //-------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ require('bugpack').context("*", function(bugpack) {
     var Class       = bugpack.require('Class');
     var Flows       = bugpack.require('Flows');
     var Obj         = bugpack.require('Obj');
+    var Throwables  = bugpack.require('Throwables');
 
 
     //-------------------------------------------------------------------------------
@@ -61,10 +63,8 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @constructs
-         * @param {BugCli} cli
-         * @param {CliBuild} cliBuild
          */
-        _constructor: function(cli, cliBuild) {
+        _constructor: function() {
 
             this._super();
 
@@ -75,21 +75,28 @@ require('bugpack').context("*", function(bugpack) {
 
             /**
              * @private
-             * @type {BugCli}
-             */
-            this.cli = cli;
-
-            /**
-             * @private
              * @type {CliBuild}
              */
-            this.cliBuild = cliBuild;
+            this.cliBuild   = null;
 
             /**
              * @private
              * @type {boolean}
              */
-            this.ran = false;
+            this.ran        = false;
+        },
+
+
+        //-------------------------------------------------------------------------------
+        // Init Methods
+        //-------------------------------------------------------------------------------
+
+        /**
+         * @param {CliBuild} cliBuild
+         */
+        initWithCliBuild: function(cliBuild) {
+            this.init();
+            this.cliBuild = cliBuild;
         },
 
 
@@ -117,7 +124,7 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {function(Error)} callback
+         * @param {function(Throwable=)} callback
          */
         run: function(callback) {
             var _this = this;
@@ -141,7 +148,7 @@ require('bugpack').context("*", function(bugpack) {
                     })
                 ]).execute(callback);
             } else {
-                callback(new Error("CliRunner should only be run once"));
+                callback(Throwables.exception("IllegalState", {}, "CliRunner should only be run once"));
             }
         },
 
@@ -152,7 +159,7 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @protected
-         * @param {function(Error=)} callback
+         * @param {function(Throwable=)} callback
          */
         initialize: function(callback) {
             callback();
@@ -160,7 +167,7 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @protected
-         * @param {function(Error=)} callback
+         * @param {function(Throwable=)} callback
          */
         validate: function(callback) {
             var cliActionInstance = this.cliBuild.getCliActionInstance();
@@ -168,7 +175,7 @@ require('bugpack').context("*", function(bugpack) {
                 var cliAction = cliActionInstance.getCliAction();
                 this.validateCliAction(cliAction, callback);
             } else {
-                callback(new Error("An action must be specified"));
+                callback(Throwables.exception("CliRunnerException", {}, "An action must be specified"));
             }
         },
 
@@ -179,7 +186,7 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @private
-         * @param {function(Error=)} callback
+         * @param {function(Throwable=)} callback
          */
         executeCliAction: function(callback) {
             var cliActionInstance = this.cliBuild.getCliActionInstance();
@@ -193,11 +200,11 @@ require('bugpack').context("*", function(bugpack) {
         /**
          * @private
          * @param {CliAction} cliAction
-         * @param {function(Error=)} callback
+         * @param {function(Throwable=)} callback
          */
         validateCliAction: function(cliAction, callback) {
-            var cliActionInstance = this.cliBuild.getCliActionInstance();
-            var validateMethod = cliAction.getValidateMethod();
+            var cliActionInstance   = this.cliBuild.getCliActionInstance();
+            var validateMethod      = cliAction.getValidateMethod();
             if (validateMethod) {
                 validateMethod(this.cliBuild, cliActionInstance, function(error) {
                     callback(error);
