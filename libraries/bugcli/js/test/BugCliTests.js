@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -76,48 +73,99 @@ require('bugpack').context("*", function(bugpack) {
             var _this = this;
             var validateCalled = false;
             var executeCalled = false;
-            this.bugCli.registerCliAction({
-                name: 'testAction',
-                flags: [
-                    'testAction'
+            this.bugCli.action({
+                command: 'testAction',
+                options: [
+                    {
+                        name: 'testOption',
+                        flags: [
+                            '--testOption'
+                        ],
+                        parameters: [
+                            {
+                                name: "testOptionParam"
+                            }
+                        ]
+                    }
                 ],
                 parameters: [
                     {
                         name: "testActionParam"
                     }
                 ],
-                executeMethod: function(cliBuild, cliAction, callback) {
+                executeMethod: function(cliBuild, cliActionInstance, callback) {
                     executeCalled = true;
-                    test.assertEqual(cliAction.getName(), "testAction",
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliAction is 'testAction'");
-                    test.assertEqual(cliAction.getParameter("testActionParam"), "actionParam",
+                    test.assertEqual(cliActionInstance.getParameter("testActionParam"), "actionParam",
                         "Assert that the parameter 'testActionParam' is 'actionParam'");
-                    var testOption = cliBuild.getOption("testOption");
+                    var testOption = cliActionInstance.getOption("testOption");
                     test.assertEqual(testOption.getParameter("testOptionParam"), "optionParam",
                         "Assert that the parameter 'testOptionParam' is 'optionParam'");
                     callback();
                 },
-                validateMethod: function(cliBuild, cliAction, callback) {
+                validateMethod: function(cliBuild, cliActionInstance, callback) {
                     validateCalled = true;
-                    test.assertEqual(cliAction.getName(), "testAction",
-                        "Assert that the cliAction is 'testAction'");
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
+                        "Assert that the cliActionInstance.command is 'testAction'");
                     callback();
                 }
             });
 
-            this.bugCli.registerCliOption({
-                name: 'testOption',
-                flags: [
-                    '--testOption'
-                ],
-                parameters: [
-                    {
-                        name: "testOptionParam"
-                    }
-                ]
+            this.bugCli.run(this.argv, function(error) {
+                if (!error) {
+                    test.assertTrue(validateCalled,
+                        "Assert that validate was called");
+                    test.assertTrue(executeCalled,
+                        "Assert that execute was called");
+                } else {
+                    test.error(error);
+                }
+            });
+        }
+    };
+
+    /**
+     *
+     */
+    var defaultActionNoOptionsNoParamsRunTest = {
+
+        // Setup Test
+        //-------------------------------------------------------------------------------
+
+        setup: function() {
+            this.bugCli = BugCli.alloc().init();
+            this.argv = [
+                "dummy",
+                "dummy"
+            ];
+        },
+
+
+        // Run Test
+        //-------------------------------------------------------------------------------
+
+        test: function(test) {
+            var validateCalled = false;
+            var executeCalled = false;
+            this.bugCli.action({
+                command: 'testAction',
+                default: true,
+                executeMethod: function(cliBuild, cliActionInstance, callback) {
+                    executeCalled = true;
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
+                        "Assert that the cliActionInstance.command is 'testAction'");
+                    callback();
+                },
+                validateMethod: function(cliBuild, cliActionInstance, callback) {
+                    validateCalled = true;
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
+                        "Assert that the cliActionInstance.command is 'testAction'");
+                    callback();
+                }
             });
 
-           this.bugCli.run(this.argv, function(error) {
+            this.bugCli.run(this.argv, function(error) {
                 if (!error) {
                     test.assertTrue(validateCalled,
                         "Assert that validate was called");
@@ -154,49 +202,46 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         test: function(test) {
-            var _this = this;
             var validateCalled = false;
             var executeCalled = false;
-            this.bugCli.registerCliAction({
-                name: 'testAction',
+            this.bugCli.action({
+                command: 'testAction',
                 default: true,
-                flags: [
-                    'testAction'
+                options: [
+                    {
+                        name: 'testOption',
+                        flags: [
+                            '--testOption'
+                        ],
+                        parameters: [
+                            {
+                                name: "testOptionParam"
+                            }
+                        ]
+                    }
                 ],
                 parameters: [
                     {
                         name: "testActionParam"
                     }
                 ],
-                executeMethod: function(cliBuild, cliAction, callback) {
+                executeMethod: function(cliBuild, cliActionInstance, callback) {
                     executeCalled = true;
-                    test.assertEqual(cliAction.getName(), "testAction",
-                        "Assert that the cliAction is 'testAction'");
-                    test.assertEqual(cliAction.getParameter("testActionParam"), "actionParam",
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
+                        "Assert that the cliActionInstance.command is 'testAction'");
+                    test.assertEqual(cliActionInstance.getParameter("testActionParam"), "actionParam",
                         "Assert that the parameter 'testActionParam' is 'actionParam'");
-                    var testOption = cliBuild.getOption("testOption");
+                    var testOption = cliActionInstance.getOption("testOption");
                     test.assertEqual(testOption.getParameter("testOptionParam"), "optionParam",
                         "Assert that the parameter 'testOptionParam' is 'optionParam'");
                     callback();
                 },
-                validateMethod: function(cliBuild, cliAction, callback) {
+                validateMethod: function(cliBuild, cliActionInstance, callback) {
                     validateCalled = true;
-                    test.assertEqual(cliAction.getName(), "testAction",
-                        "Assert that the cliAction is 'testAction'");
+                    test.assertEqual(cliActionInstance.getCommand(), "testAction",
+                        "Assert that the cliActionInstance.command is 'testAction'");
                     callback();
                 }
-            });
-
-            this.bugCli.registerCliOption({
-                name: 'testOption',
-                flags: [
-                    '--testOption'
-                ],
-                parameters: [
-                    {
-                        name: "testOptionParam"
-                    }
-                ]
             });
 
             this.bugCli.run(this.argv, function(error) {
@@ -218,9 +263,12 @@ require('bugpack').context("*", function(bugpack) {
     //-------------------------------------------------------------------------------
 
     bugmeta.tag(registerActionOptionAndRunTest).with(
-        test().name("Register CliAction and CliOption then configure and run")
+        test().name("BugCli - Register CliAction and CliOption then run")
+    );
+    bugmeta.tag(defaultActionNoOptionsNoParamsRunTest).with(
+        test().name("BugCli -  Register a default CliAction with no options and no parameters and then run")
     );
     bugmeta.tag(defaultActionOptionAndRunTest).with(
-        test().name("Register a default CliAction and a CliOption then configure and run")
+        test().name("BugCli - Register a default CliAction and a CliOption then run")
     );
 });

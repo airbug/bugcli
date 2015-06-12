@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -79,6 +76,7 @@ require('bugpack').context("*", function(bugpack) {
          * @param {{
          *      name: string
          * }} cliParameterObject
+         * @return {CliParameter}
          */
         initWithObject: function(cliParameterObject) {
             this.init();
@@ -87,6 +85,7 @@ require('bugpack').context("*", function(bugpack) {
                     this.name = cliParameterObject.name;
                 }
             }
+            return this;
         },
 
 

@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -16,6 +13,7 @@
 
 //@Require('Class')
 //@Require('bugcli.CliAction')
+//@Require('bugcli.CliParameter')
 //@Require('bugmeta.BugMeta')
 //@Require('bugunit.TestTag')
 
@@ -30,18 +28,19 @@ require('bugpack').context("*", function(bugpack) {
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class       = bugpack.require('Class');
-    var CliAction   = bugpack.require('bugcli.CliAction');
-    var BugMeta     = bugpack.require('bugmeta.BugMeta');
-    var TestTag     = bugpack.require('bugunit.TestTag');
+    var Class           = bugpack.require('Class');
+    var CliAction       = bugpack.require('bugcli.CliAction');
+    var CliParameter    = bugpack.require('bugcli.CliParameter');
+    var BugMeta         = bugpack.require('bugmeta.BugMeta');
+    var TestTag         = bugpack.require('bugunit.TestTag');
 
 
     //-------------------------------------------------------------------------------
     // Simplify References
     //-------------------------------------------------------------------------------
 
-    var bugmeta     = BugMeta.context();
-    var test        = TestTag.test;
+    var bugmeta         = BugMeta.context();
+    var test            = TestTag.test;
 
 
     //-------------------------------------------------------------------------------
@@ -62,7 +61,7 @@ require('bugpack').context("*", function(bugpack) {
                 default: true,
                 parameters: [
                     {
-                        name: "testFlag"
+                        name: "testParameter"
                     }
                 ],
                 options: [
@@ -109,9 +108,47 @@ require('bugpack').context("*", function(bugpack) {
             }
             test.assertEqual(this.testCliAction.getParameterList().getCount(), 1,
                 "Assert CliAction.parameterList count is 1");
+            test.assertEqual(this.testCliAction.hasParameters(), true,
+                "Assert CliAction#hasParameters returns true");
             if (this.testCliAction.getParameterList().getCount() === 1) {
                 test.assertEqual(this.testCliAction.getParameterList().getAt(0).getName(), this.testCliActionObject.parameters[0].name,
                     "Assert CliAction.parameterList was set correctly");
+            }
+        }
+    };
+
+    /**
+     *
+     */
+    var cliActionGetParameterWithParameterNameTest = {
+
+        // Setup Test
+        //-------------------------------------------------------------------------------
+
+        setup: function() {
+            this.testCliActionObject    = {
+                command: "test-command",
+                parameters: [
+                    {
+                        name: "testParameter"
+                    }
+                ],
+                executeMethod: function() {}
+            };
+            this.testCliAction          = CliAction.alloc().initWithObject(this.testCliActionObject);
+        },
+
+
+        // Run Test
+        //-------------------------------------------------------------------------------
+
+        test: function(test) {
+            var cliParameter = this.testCliAction.getParameterWithParameterName("testParameter");
+            test.assertTrue(Class.doesExtend(cliParameter, CliParameter),
+                "Assert returned cliParameter is a CliParameter instance");
+            if (Class.doesExtend(cliParameter, CliParameter)) {
+                test.assertEqual(cliParameter.getName(), this.testCliActionObject.parameters[0].name,
+                    "Assert returned CliParameter has the correct name");
             }
         }
     };
@@ -123,5 +160,8 @@ require('bugpack').context("*", function(bugpack) {
 
     bugmeta.tag(cliActionInstantiationTest).with(
         test().name("CliAction - instantiation test")
+    );
+    bugmeta.tag(cliActionGetParameterWithParameterNameTest).with(
+        test().name("CliAction - #getParameterWithParameterName test")
     );
 });

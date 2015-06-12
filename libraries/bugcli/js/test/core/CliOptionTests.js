@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -94,6 +91,8 @@ require('bugpack').context("*", function(bugpack) {
                 "Assert CliOption.required was set correctly");
             test.assertEqual(this.testCliOption.getParameterList().getCount(), 1,
                 "Assert CliOption.parameterList count is 1");
+            test.assertEqual(this.testCliOption.hasParameters(), true,
+                "Assert CliOption#hasParameters returns true");
             if (this.testCliOption.getParameterList().getCount() === 1) {
                 test.assertEqual(this.testCliOption.getParameterList().getAt(0).getName(), this.testCliOptionObject.parameters[0].name,
                     "Assert CliOption.parameterList was set correctly");

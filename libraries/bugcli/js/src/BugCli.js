@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2014 airbug inc. http://airbug.com
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * bugmeta may be freely distributed under the MIT license.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -14,11 +14,11 @@
 //@Require('Class')
 //@Require('Obj')
 //@Require('Proxy')
-//@Require('bugcli.Cli')
 //@Require('bugcli.CliAction')
 //@Require('bugcli.CliBuild')
 //@Require('bugcli.CliOption')
 //@Require('bugcli.CliParser')
+//@Require('bugcli.CliProgram')
 //@Require('bugcli.CliRunner')
 
 
@@ -32,15 +32,15 @@ require('bugpack').context("*", function(bugpack) {
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class               = bugpack.require('Class');
-    var Obj                 = bugpack.require('Obj');
-    var Proxy               = bugpack.require('Proxy');
-    var CliAction           = bugpack.require('bugcli.CliAction');
-    var CliBuild            = bugpack.require('bugcli.CliBuild');
-    var CliOption           = bugpack.require('bugcli.CliOption');
-    var CliParser           = bugpack.require('bugcli.CliParser');
-    var CliProgram          = bugpack.require('bugcli.CliProgram');
-    var CliRunner           = bugpack.require('bugcli.CliRunner');
+    var Class       = bugpack.require('Class');
+    var Obj         = bugpack.require('Obj');
+    var Proxy       = bugpack.require('Proxy');
+    var CliAction   = bugpack.require('bugcli.CliAction');
+    var CliBuild    = bugpack.require('bugcli.CliBuild');
+    var CliOption   = bugpack.require('bugcli.CliOption');
+    var CliParser   = bugpack.require('bugcli.CliParser');
+    var CliProgram  = bugpack.require('bugcli.CliProgram');
+    var CliRunner   = bugpack.require('bugcli.CliRunner');
 
 
     //-------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ require('bugpack').context("*", function(bugpack) {
 
     /**
      * @static
-     * @return {BugMeta}
+     * @return {BugCli}
      */
     BugCli.getInstance = function() {
         if (BugCli.instance === null) {

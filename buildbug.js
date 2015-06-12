@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2014 airbug inc. http://airbug.com
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * bugflow may be freely distributed under the MIT license.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -89,7 +89,7 @@ buildProperties({
             "./libraries/bugcli/js/src"
         ],
         scriptPaths: [
-            "./projects/bugflow-node/js/scripts"
+            "./projects/bugcli-node/js/scripts"
         ],
         readmePath: "./README.md",
         unitTest: {
@@ -262,7 +262,7 @@ buildTarget('local').buildFlow(
                             sources.push(bugPackRegistryEntry.getResolvedPath().getAbsolutePath());
                         });
                         task.updateProperties({
-                            sources: sources.concat("./projects/bugflow-web/js/scripts/bugflow-web.js")
+                            sources: sources.concat("./projects/bugcli-web/js/scripts/bugcli-web.js")
                         });
                     },
                     properties: {
@@ -327,7 +327,7 @@ buildTarget('prod').buildFlow(
         }),
         parallel([
 
-            //Create test node bugflow package
+            //Create test node bugcli package
 
             series([
                 targetTask('createNodePackage', {
@@ -373,7 +373,7 @@ buildTarget('prod').buildFlow(
                 })
             ]),
 
-            // Create production node bugflow package
+            // Create production node bugcli package
 
             series([
                 targetTask('createNodePackage', {
@@ -457,7 +457,7 @@ buildTarget('prod').buildFlow(
                             sources.push(bugPackRegistryEntry.getResolvedPath().getAbsolutePath());
                         });
                         task.updateProperties({
-                            sources: sources.concat("./projects/bugflow-web/js/scripts/bugflow-web.js")
+                            sources: sources.concat("./projects/bugcli-web/js/scripts/bugcli-web.js")
                         });
                     },
                     properties: {

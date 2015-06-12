@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -21,6 +18,7 @@
 //@Require('bugcli.CliActionInstance')
 //@Require('bugcli.CliOption')
 //@Require('bugcli.CliOptionInstance')
+//@Require('bugcli.CliParameterInstance')
 
 
 //-------------------------------------------------------------------------------
@@ -33,13 +31,14 @@ require('bugpack').context("*", function(bugpack) {
     // BugPack
     //-------------------------------------------------------------------------------
 
-    var Class               = bugpack.require('Class');
-    var Obj                 = bugpack.require('Obj');
-    var Throwables          = bugpack.require('Throwables');
-    var CliAction           = bugpack.require('bugcli.CliAction');
-    var CliActionInstance   = bugpack.require('bugcli.CliActionInstance');
-    var CliOption           = bugpack.require('bugcli.CliOption');
-    var CliOptionInstance   = bugpack.require('bugcli.CliOptionInstance');
+    var Class                   = bugpack.require('Class');
+    var Obj                     = bugpack.require('Obj');
+    var Throwables              = bugpack.require('Throwables');
+    var CliAction               = bugpack.require('bugcli.CliAction');
+    var CliActionInstance       = bugpack.require('bugcli.CliActionInstance');
+    var CliOption               = bugpack.require('bugcli.CliOption');
+    var CliOptionInstance       = bugpack.require('bugcli.CliOptionInstance');
+    var CliParameterInstance    = bugpack.require('bugcli.CliParameterInstance');
 
 
     //-------------------------------------------------------------------------------
@@ -91,10 +90,12 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @param {CliConfiguration} cliConfiguration
+         * @return {CliParser}
          */
         initWithCliConfiguration: function(cliConfiguration) {
             this.init();
             this.cliConfiguration = cliConfiguration;
+            return this;
         },
 
 
@@ -246,8 +247,13 @@ require('bugpack').context("*", function(bugpack) {
                 var cliParameterList = cliAction.getParameterList();
                 for (var i = 0, size = cliParameterList.getCount(); i < size; i++) {
                     var cliParameter = cliParameterList.getAt(i);
-                    var nextArg = this.nextArg(argv);
-                    cliActionInstance.addCliParameterInstance(cliParameter.getName(), nextArg);
+                    if (this.hasNextArg(argv)) {
+                        var nextArg = this.nextArg(argv);
+                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, nextArg);
+                        cliActionInstance.addCliParameterInstance(cliParameterInstance);
+                    } else {
+                        throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for command '" + cliAction.getCommand() + "'");
+                    }
                 }
             }
         },
@@ -258,7 +264,6 @@ require('bugpack').context("*", function(bugpack) {
          * @param {CliActionInstance} cliActionInstance
          */
         parseCliOptionInstanceForCliActionInstance: function(argv, cliActionInstance) {
-            var _this = this;
             var flag = this.nextArg(argv);
             var cliOption = cliActionInstance.getCliAction().getOptionWithFlag(flag);
             if (!cliOption) {
@@ -273,8 +278,13 @@ require('bugpack').context("*", function(bugpack) {
                 var cliParameterList = cliOption.getParameterList();
                 for (var i = 0, size = cliParameterList.getCount(); i < size; i++) {
                     var cliParameter = cliParameterList.getAt(i);
-                    var nextArg = _this.nextArg(argv);
-                    cliOptionInstance.addCliParameterInstance(cliParameter.getName(), nextArg);
+                    if (this.hasNextArg(argv)) {
+                        var nextArg = this.nextArg(argv);
+                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, nextArg);
+                        cliOptionInstance.addCliParameterInstance(cliParameterInstance);
+                    } else {
+                        throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for option '" + cliOption.getName() + "'");
+                    }
                 }
             }
         },

@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -85,10 +82,12 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @param {CliOption} cliOption
+         * @return {CliOptionInstance}
          */
         initWithCliOption: function(cliOption) {
-            this.init(cliOption);
+            this.init();
             this.cliOption = cliOption;
+            return this;
         },
 
 
@@ -136,13 +135,10 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {string} parameterName
-         * @param {string} value
+         * @param {CliParameterInstance} cliParameterInstance
          */
-        addCliParameterInstance: function(parameterName, value) {
-            var cliParameter = this.cliOption.getParameterWithParameterName(parameterName);
-            var cliParameterInstance = new CliParameterInstance(cliParameter, value);
-            this.cliParameterInstanceMap.put(parameterName, cliParameterInstance);
+        addCliParameterInstance: function(cliParameterInstance) {
+            this.cliParameterInstanceMap.put(cliParameterInstance.getParameterName(), cliParameterInstance);
         },
 
         /**
@@ -161,7 +157,7 @@ require('bugpack').context("*", function(bugpack) {
         /**
          * @return {string}
          */
-        getName: function() {
+        getOptionName: function() {
             return this.cliOption.getName();
         },
 

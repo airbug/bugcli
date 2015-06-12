@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2014 airbug Inc. All rights reserved.
+ * Copyright (c) 2015 airbug inc. http://airbug.com
  *
- * All software, both binary and source contained in this work is the exclusive property
- * of airbug Inc. Modification, decompilation, disassembly, or any other means of discovering
- * the source code of this software is prohibited. This work is protected under the United
- * States copyright law and other international copyright treaties and conventions.
+ * bugcli may be freely distributed under the MIT license.
  */
 
 
@@ -48,9 +45,9 @@ require('bugpack').context("*", function(bugpack) {
 
     /**
      * @class
-     * @extends {CliFlag}
+     * @extends {Obj}
      */
-    var CliAction = Class.extend(CliFlag, {
+    var CliAction = Class.extend(Obj, {
 
         _name: "bugcli.CliAction",
 
@@ -127,9 +124,10 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @param {Object} cliActionObject
+         * @return {CliAction}
          */
         initWithObject: function(cliActionObject) {
-            this._super();
+            this.init();
 
             var _this = this;
             if (TypeUtil.isObject(cliActionObject)) {
@@ -168,12 +166,13 @@ require('bugpack').context("*", function(bugpack) {
                 }
                 if (TypeUtil.isArray(cliActionObject.parameters)) {
                     cliActionObject.parameters.forEach(function (parameterObject) {
-                        var cliParameter = new CliParameter(parameterObject);
+                        var cliParameter = CliParameter.alloc().initWithObject(parameterObject);
                         _this.parameterList.add(cliParameter);
                         _this.parameterMap.put(cliParameter.getName(), cliParameter);
                     });
                 }
             }
+            return this;
         },
 
 
