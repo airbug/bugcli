@@ -46,7 +46,7 @@ var uglifyjs            = enableModule("uglifyjs");
 //-------------------------------------------------------------------------------
 
 var name                = "bugcli";
-var version             = "0.0.1";
+var version             = "0.0.2";
 var dependencies        = {
     bugpack: "0.2.0"
 };
@@ -419,12 +419,6 @@ buildTarget('prod').buildFlow(
                         bucket: "{{public-bucket}}"
                     }
                 }),
-                targetTask('npmConfigSet', {
-                    properties: {
-                        config: buildProject.getProperty("npmConfig")
-                    }
-                }),
-                targetTask('npmAddUser'),
                 targetTask('publishNodePackage', {
                     properties: {
                         packageName: "{{node.packageJson.name}}",

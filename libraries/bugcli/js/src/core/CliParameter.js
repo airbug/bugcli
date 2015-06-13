@@ -64,7 +64,13 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {string}
              */
-            this.name = "";
+            this.name   = "";
+
+            /**
+             * @private
+             * @type {string}
+             */
+            this.type   = "string";
         },
 
 
@@ -74,7 +80,8 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @param {{
-         *      name: string
+         *      name: string,
+         *      type: string
          * }} cliParameterObject
          * @return {CliParameter}
          */
@@ -83,6 +90,14 @@ require('bugpack').context("*", function(bugpack) {
             if (TypeUtil.isObject(cliParameterObject)) {
                 if (TypeUtil.isString(cliParameterObject.name)) {
                     this.name = cliParameterObject.name;
+                }
+                if (TypeUtil.isString(cliParameterObject.type)) {
+                    switch (cliParameterObject.type) {
+                        case CliParameter.Types.NUMBER:
+                        case CliParameter.Types.STRING:
+                            this.type = cliParameterObject.type;
+                            break;
+                    }
                 }
             }
             return this;
@@ -98,8 +113,28 @@ require('bugpack').context("*", function(bugpack) {
          */
         getName: function() {
             return this.name;
+        },
+
+        /**
+         * @return {string}
+         */
+        getType: function() {
+            return this.type;
         }
     });
+
+
+    //-------------------------------------------------------------------------------
+    // Static Properties
+    //-------------------------------------------------------------------------------
+
+    /**
+     * @enum {string}
+     */
+    CliParameter.Types = {
+        NUMBER: "number",
+        STRING: "string"
+    };
 
 
     //-------------------------------------------------------------------------------

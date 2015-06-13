@@ -18,6 +18,7 @@
 //@Require('bugcli.CliActionInstance')
 //@Require('bugcli.CliOption')
 //@Require('bugcli.CliOptionInstance')
+//@Require('bugcli.CliParameter')
 //@Require('bugcli.CliParameterInstance')
 
 
@@ -38,6 +39,7 @@ require('bugpack').context("*", function(bugpack) {
     var CliActionInstance       = bugpack.require('bugcli.CliActionInstance');
     var CliOption               = bugpack.require('bugcli.CliOption');
     var CliOptionInstance       = bugpack.require('bugcli.CliOptionInstance');
+    var CliParameter            = bugpack.require('bugcli.CliParameter');
     var CliParameterInstance    = bugpack.require('bugcli.CliParameterInstance');
 
 
@@ -249,7 +251,8 @@ require('bugpack').context("*", function(bugpack) {
                     var cliParameter = cliParameterList.getAt(i);
                     if (this.hasNextArg(argv)) {
                         var nextArg = this.nextArg(argv);
-                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, nextArg);
+                        var value = this.parseParameterValue(nextArg, cliParameter);
+                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, value);
                         cliActionInstance.addCliParameterInstance(cliParameterInstance);
                     } else {
                         throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for command '" + cliAction.getCommand() + "'");
@@ -280,7 +283,8 @@ require('bugpack').context("*", function(bugpack) {
                     var cliParameter = cliParameterList.getAt(i);
                     if (this.hasNextArg(argv)) {
                         var nextArg = this.nextArg(argv);
-                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, nextArg);
+                        var value = this.parseParameterValue(nextArg, cliParameter);
+                        var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, value);
                         cliOptionInstance.addCliParameterInstance(cliParameterInstance);
                     } else {
                         throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for option '" + cliOption.getName() + "'");
@@ -302,6 +306,22 @@ require('bugpack').context("*", function(bugpack) {
             var cliActionInstance = CliActionInstance.alloc().initWithCliAction(defaultCliAction);
             cliBuild.setCliActionInstance(cliActionInstance);
             this.parseCliActionInstanceOptionsAndParameters(argv, cliActionInstance);
+        },
+
+        /**
+         * @private
+         * @param {*} value
+         * @param {CliParameter} cliParameter
+         * @return {*}
+         */
+        parseParameterValue: function(value, cliParameter) {
+            switch(cliParameter.getType()) {
+                case CliParameter.Types.NUMBER:
+                    return parseFloat(value);
+                    break;
+                default:
+                    return value;
+            }
         }
     });
 

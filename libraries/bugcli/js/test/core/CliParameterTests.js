@@ -55,7 +55,8 @@ require('bugpack').context("*", function(bugpack) {
 
         setup: function() {
             this.testCliParameterObject     = {
-                name: "testOption"
+                name: "testOption",
+                type: "string"
             };
             this.testCliParameter           = CliParameter.alloc().initWithObject(this.testCliParameterObject);
         },
@@ -69,6 +70,8 @@ require('bugpack').context("*", function(bugpack) {
                 "Assert instance of CliParameter");
             test.assertEqual(this.testCliParameter.getName(), this.testCliParameterObject.name,
                 "Assert CliParameter.name was set correctly");
+            test.assertEqual(this.testCliParameter.getType(), this.testCliParameterObject.type,
+                "Assert CliParameter.type was set correctly");
         }
     };
 
