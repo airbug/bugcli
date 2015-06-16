@@ -93,7 +93,7 @@ require('bugpack').context("*", function(bugpack) {
                         name: "testActionParam"
                     }
                 ],
-                executeMethod: function(cliBuild, cliActionInstance, callback) {
+                executeMethod: function(cliActionInstance, callback) {
                     executeCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliAction is 'testAction'");
@@ -104,7 +104,7 @@ require('bugpack').context("*", function(bugpack) {
                         "Assert that the parameter 'testOptionParam' is 'optionParam'");
                     callback();
                 },
-                validateMethod: function(cliBuild, cliActionInstance, callback) {
+                validateMethod: function(cliActionInstance, callback) {
                     validateCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliActionInstance.command is 'testAction'");
@@ -151,13 +151,13 @@ require('bugpack').context("*", function(bugpack) {
             this.bugCli.action({
                 command: 'testAction',
                 default: true,
-                executeMethod: function(cliBuild, cliActionInstance, callback) {
+                executeMethod: function(cliActionInstance, callback) {
                     executeCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliActionInstance.command is 'testAction'");
                     callback();
                 },
-                validateMethod: function(cliBuild, cliActionInstance, callback) {
+                validateMethod: function(cliActionInstance, callback) {
                     validateCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliActionInstance.command is 'testAction'");
@@ -225,7 +225,7 @@ require('bugpack').context("*", function(bugpack) {
                         name: "testActionParam"
                     }
                 ],
-                executeMethod: function(cliBuild, cliActionInstance, callback) {
+                executeMethod: function(cliActionInstance, callback) {
                     executeCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliActionInstance.command is 'testAction'");
@@ -236,7 +236,7 @@ require('bugpack').context("*", function(bugpack) {
                         "Assert that the parameter 'testOptionParam' is 'optionParam'");
                     callback();
                 },
-                validateMethod: function(cliBuild, cliActionInstance, callback) {
+                validateMethod: function(cliActionInstance, callback) {
                     validateCalled = true;
                     test.assertEqual(cliActionInstance.getCommand(), "testAction",
                         "Assert that the cliActionInstance.command is 'testAction'");

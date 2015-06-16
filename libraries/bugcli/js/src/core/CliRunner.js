@@ -191,7 +191,7 @@ require('bugpack').context("*", function(bugpack) {
             var cliActionInstance = this.cliBuild.getCliActionInstance();
             var cliAction = cliActionInstance.getCliAction();
             var executeMethod = cliAction.getExecuteMethod();
-            executeMethod(this.cliBuild, cliActionInstance, function(error) {
+            executeMethod(cliActionInstance, function(error) {
                 callback(error);
             });
         },
@@ -205,7 +205,7 @@ require('bugpack').context("*", function(bugpack) {
             var cliActionInstance   = this.cliBuild.getCliActionInstance();
             var validateMethod      = cliAction.getValidateMethod();
             if (validateMethod) {
-                validateMethod(this.cliBuild, cliActionInstance, function(error) {
+                validateMethod(cliActionInstance, function(error) {
                     callback(error);
                 });
             } else {
