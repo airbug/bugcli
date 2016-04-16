@@ -24,7 +24,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -49,7 +49,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliAction = Class.extend(Obj, {
 
-        _name: "bugcli.CliAction",
+        _name: 'bugcli.CliAction',
 
 
         //-------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {string}
              */
-            this.command                = "";
+            this.command                = '';
 
             /**
              * @private
@@ -134,7 +134,7 @@ require('bugpack').context("*", function(bugpack) {
                 if (TypeUtil.isString(cliActionObject.command)) {
                     this.command = cliActionObject.command;
                 } else {
-                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.command must be specified and must be a string");
+                    throw Throwables.illegalArgumentBug('CliAction.initWithObject', cliActionObject, 'cliActionObject.command must be specified and must be a string');
                 }
                 if (TypeUtil.isBoolean(cliActionObject.default)) {
                     this.default = cliActionObject.default;
@@ -142,7 +142,7 @@ require('bugpack').context("*", function(bugpack) {
                 if (TypeUtil.isFunction(cliActionObject.executeMethod)) {
                     this.executeMethod = cliActionObject.executeMethod;
                 } else {
-                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.executeMethod must be specified and must be a function");
+                    throw Throwables.illegalArgumentBug('CliAction.initWithObject', cliActionObject, 'cliActionObject.executeMethod must be specified and must be a function');
                 }
                 if (TypeUtil.isFunction(cliActionObject.validateMethod)) {
                     this.validateMethod = cliActionObject.validateMethod;
@@ -156,11 +156,11 @@ require('bugpack').context("*", function(bugpack) {
                                 if (!_this.flagToOptionMap.containsKey(flag)) {
                                     _this.flagToOptionMap.put(flag, cliOption);
                                 } else {
-                                    throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.options - duplicate flag found");
+                                    throw Throwables.illegalArgumentBug('CliAction.initWithObject', cliActionObject, 'cliActionObject.options - duplicate flag found');
                                 }
                             });
                         } else {
-                            throw Throwables.illegalArgumentBug("CliAction.initWithObject", cliActionObject, "cliActionObject.options - duplicate option found");
+                            throw Throwables.illegalArgumentBug('CliAction.initWithObject', cliActionObject, 'cliActionObject.options - duplicate option found');
                         }
                     });
                 }
@@ -243,7 +243,7 @@ require('bugpack').context("*", function(bugpack) {
          */
         hashCode: function() {
             if (!this._hashCode) {
-                this._hashCode = Obj.hashCode("[CliAction]" +
+                this._hashCode = Obj.hashCode('[CliAction]' +
                     Obj.hashCode(this.command));
             }
             return this._hashCode;

@@ -21,7 +21,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -43,7 +43,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliActionInstance = Class.extend(Obj, {
 
-        _name: "bugcli.CliActionInstance",
+        _name: 'bugcli.CliActionInstance',
 
 
         //-------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ require('bugpack').context("*", function(bugpack) {
          */
         hashCode: function() {
             if (!this._hashCode) {
-                this._hashCode = Obj.hashCode("[CliActionInstance]" +
+                this._hashCode = Obj.hashCode('[CliActionInstance]' +
                     Obj.hashCode(this.cliAction));
             }
             return this._hashCode;

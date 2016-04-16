@@ -20,7 +20,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -41,7 +41,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliParameter = Class.extend(Obj, {
 
-        _name: "bugcli.CliParameter",
+        _name: 'bugcli.CliParameter',
 
 
         //-------------------------------------------------------------------------------
@@ -64,13 +64,13 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {string}
              */
-            this.name   = "";
+            this.name   = '';
 
             /**
              * @private
              * @type {string}
              */
-            this.type   = "string";
+            this.type   = 'string';
         },
 
 
@@ -132,8 +132,8 @@ require('bugpack').context("*", function(bugpack) {
      * @enum {string}
      */
     CliParameter.Types = {
-        NUMBER: "number",
-        STRING: "string"
+        NUMBER: 'number',
+        STRING: 'string'
     };
 
 

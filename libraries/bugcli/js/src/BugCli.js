@@ -26,7 +26,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -53,7 +53,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var BugCli = Class.extend(Obj, {
 
-        _name: "bugcli.BugCli",
+        _name: 'bugcli.BugCli',
 
 
         //-------------------------------------------------------------------------------
@@ -194,9 +194,9 @@ require('bugpack').context("*", function(bugpack) {
     //-------------------------------------------------------------------------------
 
     Proxy.proxy(BugCli, Proxy.method(BugCli.getInstance), [
-        "action",
-        "program",
-        "run"
+        'action',
+        'program',
+        'run'
     ]);
 
 

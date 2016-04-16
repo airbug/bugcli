@@ -26,7 +26,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -53,7 +53,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliParser = Class.extend(Obj, {
 
-        _name: "bugcli.CliParser",
+        _name: 'bugcli.CliParser',
 
 
         //-------------------------------------------------------------------------------
@@ -127,13 +127,11 @@ require('bugpack').context("*", function(bugpack) {
         /**
          * @param {Array.<string>} argv
          * @param {CliBuild} cliBuild
-         * @param {function(Throwable=)} callback
          */
-        parse: function(argv, cliBuild, callback) {
+        parse: function(argv, cliBuild) {
 
             //TODO BRN: rework this..
             this.index = 1;
-            var throwable = null;
             var unknownArguments = [];
             while (this.hasNextArg(argv)) {
                 var arg = this.peekArg(argv);
@@ -141,7 +139,7 @@ require('bugpack').context("*", function(bugpack) {
                     if (!cliBuild.hasCliActionInstance()) {
                         this.parseCliActionInstance(argv, cliBuild);
                     } else {
-                        throwable = Throwables.exception("CliParserException", {}, "Duplicate action '" + arg + "' found. Can only specify one action.")
+                       throw Throwables.exception('CliParserException', {}, 'Duplicate action "' + arg + '" found. Can only specify one action.')
                     }
                 } else if (this.cliConfiguration.hasDefaultCliAction()) {
                     this.parseDefaultCliActionInstance(argv, cliBuild)
@@ -149,20 +147,18 @@ require('bugpack').context("*", function(bugpack) {
                     unknownArguments.push(arg);
                 }
             }
-            if (!throwable) {
-                if (!cliBuild.hasCliActionInstance()) {
-                    if (this.cliConfiguration.hasDefaultCliAction()) {
-                        this.parseDefaultCliActionInstance(argv, cliBuild);
-                    } else {
-                        throwable = Throwables.exception("CliParserException", {}, "No action specified and no default action found.");
-                    }
-                }
-
-                if (unknownArguments.length > 0 && !throwable) {
-                    throwable = Throwables.exception("CliParserException", {}, "Unknown argument '" + unknownArguments[0] + "'");
+ 
+            if (!cliBuild.hasCliActionInstance()) {
+                if (this.cliConfiguration.hasDefaultCliAction()) {
+                    this.parseDefaultCliActionInstance(argv, cliBuild);
+                } else {
+                    throw Throwables.exception('CliParserException', {}, 'No action specified and no default action found.');
                 }
             }
-            callback(throwable);
+
+            if (unknownArguments.length > 0 && !throwable) {
+                throw Throwables.exception('CliParserException', {}, 'Unknown argument "' + unknownArguments[0] + '"');
+            }
         },
 
 
@@ -216,11 +212,11 @@ require('bugpack').context("*", function(bugpack) {
             var command     = this.nextArg(argv);
             var cliAction   = this.cliConfiguration.getCliActionWithCommand(command);
             if (!cliAction) {
-                throw Throwables.bug("CliParserBug", {}, "No CliAction found with command '" + command + "'");
+                throw Throwables.bug('CliParserBug', {}, 'No CliAction found with command "' + command + '"');
             }
             var cliActionInstance = CliActionInstance.alloc().initWithCliAction(cliAction);
             if (cliBuild.hasCliActionInstance()) {
-                throw Throwables.exception("CliParserException", {}, "Duplicate action found '" + command + "'");
+                throw Throwables.exception('CliParserException', {}, 'Duplicate action found "' + command + '"');
             }
             cliBuild.setCliActionInstance(cliActionInstance);
             this.parseCliActionInstanceOptionsAndParameters(argv, cliActionInstance);
@@ -255,7 +251,7 @@ require('bugpack').context("*", function(bugpack) {
                         var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, value);
                         cliActionInstance.addCliParameterInstance(cliParameterInstance);
                     } else {
-                        throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for command '" + cliAction.getCommand() + "'");
+                        throw Throwables.exception('Could not find parameter "' + cliParameter.getName() + '" for command "' + cliAction.getCommand() + '"');
                     }
                 }
             }
@@ -270,11 +266,11 @@ require('bugpack').context("*", function(bugpack) {
             var flag = this.nextArg(argv);
             var cliOption = cliActionInstance.getCliAction().getOptionWithFlag(flag);
             if (!cliOption) {
-                throw Throwables.bug("CliParserBug", {}, "No CliOption found with flag '" + flag + "'");
+                throw Throwables.bug('CliParserBug', {}, 'No CliOption found with flag "' + flag + '"');
             }
             var cliOptionInstance = CliOptionInstance.alloc().initWithCliOption(cliOption);
             if (cliActionInstance.hasCliOptionInstance(cliOptionInstance)) {
-                throw Throwables.exception("ParseException", {}, "Duplicate option found '" + flag + "'")
+                throw Throwables.exception('ParseException', {}, 'Duplicate option found "' + flag + '"');
             }
             cliActionInstance.addCliOptionInstance(cliOptionInstance);
             if (cliOption.hasParameters()) {
@@ -287,7 +283,7 @@ require('bugpack').context("*", function(bugpack) {
                         var cliParameterInstance = CliParameterInstance.alloc().initWithCliParameterAndValue(cliParameter, value);
                         cliOptionInstance.addCliParameterInstance(cliParameterInstance);
                     } else {
-                        throw Throwables.exception("Could not find parameter '" + cliParameter.getName() + "' for option '" + cliOption.getName() + "'");
+                        throw Throwables.exception('Could not find parameter "' + cliParameter.getName() + '" for option "' + cliOption.getName() + '"');
                     }
                 }
             }
@@ -301,7 +297,7 @@ require('bugpack').context("*", function(bugpack) {
         parseDefaultCliActionInstance: function(argv, cliBuild) {
             var defaultCliAction = this.cliConfiguration.getDefaultCliAction();
             if (!defaultCliAction) {
-                throw Throwables.bug("CliParserBug", {}, "No default CliAction found.");
+                throw Throwables.bug('CliParserBug', {}, 'No default CliAction found.');
             }
             var cliActionInstance = CliActionInstance.alloc().initWithCliAction(defaultCliAction);
             cliBuild.setCliActionInstance(cliActionInstance);
@@ -316,11 +312,11 @@ require('bugpack').context("*", function(bugpack) {
          */
         parseParameterValue: function(value, cliParameter) {
             switch(cliParameter.getType()) {
-                case CliParameter.Types.NUMBER:
-                    return parseFloat(value);
-                    break;
-                default:
-                    return value;
+            case CliParameter.Types.NUMBER:
+                return parseFloat(value);
+                break;
+            default:
+                return value;
             }
         }
     });

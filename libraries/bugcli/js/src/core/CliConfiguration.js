@@ -22,7 +22,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -45,7 +45,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliConfiguration = Class.extend(Obj, {
 
-        _name: "bugcli.CliConfiguration",
+        _name: 'bugcli.CliConfiguration',
 
 
         //-------------------------------------------------------------------------------
@@ -112,14 +112,14 @@ require('bugpack').context("*", function(bugpack) {
          */
         addCliAction: function(cliAction) {
             if (this.cliActionSet.contains(cliAction)) {
-                throw Throwables.exception("CliConfigurationException", {}, "CliAction already exists for the command '" + cliAction.getCommand() + "'");
+                throw Throwables.exception('CliConfigurationException', {}, 'CliAction already exists for the command "' + cliAction.getCommand() + '"');
             }
             this.commandToCliActionMap.put(cliAction.getCommand(), cliAction);
             if (cliAction.getDefault()) {
                 if (!this.hasDefaultCliAction()) {
                     this.defaultCliAction = cliAction;
                 } else {
-                    throw Throwables.exception("CliConfigurationException", {}, "Can only specify one cliAction default. Found a second '" + cliAction.getCommand() + "'");
+                    throw Throwables.exception('CliConfigurationException', {}, 'Can only specify one cliAction default. Found a second "' + cliAction.getCommand() + '"');
                 }
             }
         },

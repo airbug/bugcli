@@ -28,7 +28,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // Common Modules
@@ -72,7 +72,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliProgram = Class.extend(Obj, {
 
-        _name: "bugcli.CliProgram",
+        _name: 'bugcli.CliProgram',
 
 
         //-------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ require('bugpack').context("*", function(bugpack) {
 
             //TODO BRN: generate help text based on cliActions and cliOptions
 
-            return "TODO add help text";
+            return 'TODO add help text';
         },
 
         /**
@@ -195,29 +195,22 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @param {Array.<string>} argv
-         * @param {function(Throwable=)} callback
+         * @return {Promise}
          */
-        run: function(argv, callback) {
-            var _this       = this;
+        run: function(argv) {
             var cliBuild    = CliBuild.alloc().init();
             var cliRunner   = CliRunner.alloc().initWithCliBuild(cliBuild);
-            $series([
-                $task(function(flow) {
-                    _this.configure(function(throwable) {
-                        flow.complete(throwable);
-                    });
-                }),
-                $task(function(flow) {
-                    _this.cliParser.parse(argv, cliBuild, function(throwable) {
-                        flow.complete(throwable);
-                    });
-                }),
-                $task(function(flow) {
-                    cliRunner.run(function(throwable) {
-                        flow.complete(throwable);
-                    });
-                })
-            ]).execute(callback);
+            return $series([
+                () => {
+                    return this.configure();
+                },
+                () => {
+                    return this.cliParser.parse(argv, cliBuild);
+                },
+                () => {
+                    return cliRunner.run();
+                }
+            ]).then();
         },
 
 
@@ -227,10 +220,10 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @protected
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        doConfigure: function(callback) {
-            callback();
+        doConfigure: function() {
+            return true;
         },
 
 
@@ -240,17 +233,10 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @private
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        configure: function(callback) {
-            var _this = this;
-            $series([
-                $task(function(flow) {
-                    _this.doConfigure(function(throwable) {
-                        flow.complete(throwable);
-                    });
-                })
-            ]).execute(callback)
+        configure: function() {
+            return this.doConfigure();
         }
     });
 

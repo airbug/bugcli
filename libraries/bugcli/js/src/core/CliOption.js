@@ -23,7 +23,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -47,7 +47,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliOption = Class.extend(Obj, {
 
-        _name: "bugcli.CliOption",
+        _name: 'bugcli.CliOption',
 
 
         //-------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ require('bugpack').context("*", function(bugpack) {
              * @private
              * @type {string}
              */
-            this.name               = "";
+            this.name               = '';
 
             /**
              * @private
@@ -123,7 +123,7 @@ require('bugpack').context("*", function(bugpack) {
                         }
                     });
                 } else {
-                    throw Throwables.illegalArgumentBug("CliOption.initWithObject", cliOptionObject, "cliOptionObject.flags must be specified, must be an array and must not be empty");
+                    throw Throwables.illegalArgumentBug('CliOption.initWithObject', cliOptionObject, 'cliOptionObject.flags must be specified, must be an array and must not be empty');
                 }
                 if (TypeUtil.isArray(cliOptionObject.parameters)) {
                     cliOptionObject.parameters.forEach(function (parameterObject) {
@@ -190,7 +190,7 @@ require('bugpack').context("*", function(bugpack) {
          */
         hashCode: function() {
             if (!this._hashCode) {
-                this._hashCode = Obj.hashCode("[CliOption]" +
+                this._hashCode = Obj.hashCode('[CliOption]' +
                     Obj.hashCode(this.name));
             }
             return this._hashCode;

@@ -48,7 +48,7 @@ var uglifyjs            = enableModule("uglifyjs");
 var name                = "bugcli";
 var version             = "0.0.2";
 var dependencies        = {
-    bugpack: "0.2.0"
+    bugpack: "0.2.2"
 };
 
 

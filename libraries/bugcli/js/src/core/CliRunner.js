@@ -21,7 +21,7 @@
 // Context
 //-------------------------------------------------------------------------------
 
-require('bugpack').context("*", function(bugpack) {
+require('bugpack').context('*', function(bugpack) {
 
     //-------------------------------------------------------------------------------
     // BugPack
@@ -51,7 +51,7 @@ require('bugpack').context("*", function(bugpack) {
      */
     var CliRunner = Class.extend(Obj, {
 
-        _name: "bugcli.CliRunner",
+        _name: 'bugcli.CliRunner',
 
 
         //-------------------------------------------------------------------------------
@@ -123,31 +123,24 @@ require('bugpack').context("*", function(bugpack) {
         //-------------------------------------------------------------------------------
 
         /**
-         * @param {function(Throwable=)} callback
+         *
          */
-        run: function(callback) {
-            var _this = this;
+        run: function() {
             if (!this.ran) {
                 this.ran = true;
-                $series([
-                    $task(function(flow) {
-                        _this.validate(function(error) {
-                            flow.complete(error);
-                        });
-                    }),
-                    $task(function(flow) {
-                        _this.initialize(function(error) {
-                            flow.complete(error);
-                        });
-                    }),
-                    $task(function(flow) {
-                        _this.executeCliAction(function(error) {
-                            flow.complete(error);
-                        })
-                    })
-                ]).execute(callback);
+                return $series([
+                    () => {
+                        return this.validate();
+                    },
+                    () => {
+                        return this.initialize();
+                    },
+                    () => {
+                        return this.executeCliAction();
+                    }
+                ]).then();
             } else {
-                callback(Throwables.exception("IllegalState", {}, "CliRunner should only be run once"));
+                throw Throwables.exception('IllegalState', {}, 'CliRunner should only be run once');
             }
         },
 
@@ -158,23 +151,23 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @protected
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        initialize: function(callback) {
-            callback();
+        initialize: function() {
+            return true;
         },
 
         /**
          * @protected
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        validate: function(callback) {
+        validate: function() {
             var cliActionInstance = this.cliBuild.getCliActionInstance();
             if (cliActionInstance) {
                 var cliAction = cliActionInstance.getCliAction();
-                this.validateCliAction(cliAction, callback);
+                return this.validateCliAction(cliAction, callback);
             } else {
-                callback(Throwables.exception("CliRunnerException", {}, "An action must be specified"));
+                throw Throwables.exception('CliRunnerException', {}, 'An action must be specified');
             }
         },
 
@@ -185,31 +178,27 @@ require('bugpack').context("*", function(bugpack) {
 
         /**
          * @private
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        executeCliAction: function(callback) {
+        executeCliAction: function() {
             var cliActionInstance = this.cliBuild.getCliActionInstance();
             var cliAction = cliActionInstance.getCliAction();
             var executeMethod = cliAction.getExecuteMethod();
-            executeMethod(cliActionInstance, function(error) {
-                callback(error);
-            });
+            return executeMethod(cliActionInstance);
         },
 
         /**
          * @private
          * @param {CliAction} cliAction
-         * @param {function(Throwable=)} callback
+         * @return {*}
          */
-        validateCliAction: function(cliAction, callback) {
+        validateCliAction: function(cliAction) {
             var cliActionInstance   = this.cliBuild.getCliActionInstance();
             var validateMethod      = cliAction.getValidateMethod();
             if (validateMethod) {
-                validateMethod(cliActionInstance, function(error) {
-                    callback(error);
-                });
+                return validateMethod(cliActionInstance);
             } else {
-                callback();
+                return true;
             }
         }
     });
